@@ -15,8 +15,10 @@
 
         private static void Train(NeuralNetwork nn, CNN cnn, string filename)
         {
+            float[,] sumWeightErrorBridge = new float[1000, 16];
             using (var reader = new StreamReader(filename))
             {
+                int counter = 0;
                 while (!reader.EndOfStream)
                 {
                     var line = reader.ReadLine();
@@ -32,7 +34,20 @@
                     float[] preparedImage = cnn.getPreparedImage(grayscales);
 
                     nn.Process(preparedImage);
-                    nn.BackPropagate(oneHotEncoding, preparedImage);
+
+                    // get the sumweight error from input layer on NN
+
+                    nn.BackPropagate(oneHotEncoding, preparedImage, ref sumWeightErrorBridge);
+
+                    cnn.maxPoolSumWeightError(sumWeightErrorBridge, 8, counter);
+                    cnn.backPropKernel(4);
+                    if (counter == 999)
+                    {
+                        cnn.updateKernel2();
+                        counter = 0;
+                    }
+
+                    counter++;
                 }
             }
         }

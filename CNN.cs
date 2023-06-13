@@ -3,11 +3,17 @@
 public class CNN
 {
     private float[,] kernel1, kernel2;
+    private float[,] kernel1deltaWeight, kernel2deltaWeight;
+    private float[,] maxPooledImage1cache;
+    private float[,] feature2sumWeightError;
 
     public CNN()
     {
         kernel1 = createRandomKernel();
         kernel2 = createRandomKernel();
+        kernel1deltaWeight = new float[5, 5];
+        kernel2deltaWeight = new float[5, 5];
+        feature2sumWeightError = new float[64,64];
     }
 
     private float[,] createRandomKernel()
@@ -41,6 +47,7 @@ public class CNN
         return reshapedImage;
     }
 
+
     private float[] flattenImage(float[,] images, int dimension)
     {
         float[] flattenedImage = new float[dimension * dimension];
@@ -55,12 +62,59 @@ public class CNN
         return flattenedImage;
     }
 
+    public void backPropKernel(int dimension)
+    {
+        for (int centerY = 2; centerY < dimension - 2; centerY++)
+        {
+            for (int centerX = 2; centerX < dimension - 2; centerX++)
+            {
+                float sum = 0;
+                // looptrough kernel
+                for (int y = -2; y < 2; y++)
+                {
+                    for (int x = -2; x < 2; x++)
+                        kernel2deltaWeight[x + 2, y + 2] += maxPooledImage1cache[centerX + x, centerY + y] *
+                                                            feature2sumWeightError[centerX - 2, centerY - 2];
+                }
+            }
+        }
+    }
+
+    public void updateKernel2()
+    {
+        for (int y = 0; y < 5; y++)
+        {
+            for (int x = 0; x < 5; x++)
+            {
+                kernel2[x, y] += kernel2deltaWeight[x, y];
+                kernel2deltaWeight[x, y] = 0;
+            }
+        }
+    }
+
+    public void maxPoolSumWeightError(float[,] sumWeightError, int originalImageDimension, int learning_batch)
+    {
+        int counter = 0;
+        for (int cornerY = 0; cornerY <originalImageDimension - 2; cornerY += 2)
+        {
+            for (int cornerX = 0; cornerX < originalImageDimension - 2; cornerX += 2)
+            {
+                feature2sumWeightError[cornerX, cornerY] = sumWeightError[learning_batch, counter];
+                feature2sumWeightError[cornerX + 1, cornerY] = sumWeightError[learning_batch, counter];
+                feature2sumWeightError[cornerX, cornerY + 1] = sumWeightError[learning_batch, counter];
+                feature2sumWeightError[cornerX + 1, cornerY + 1] = sumWeightError[learning_batch, counter];
+                counter++;
+            }
+        }
+    }
+
     public float[] getPreparedImage(float[] originalImage)
     {
         float[,] reshapedImage = reshapeImage(originalImage, 28);
 
         float[,] featureLayer1 = GetFeatureLayer(reshapedImage, kernel1, 28);
         float[,] maxPooledImage1 = GetMaxPooledImage(featureLayer1, 24);
+        maxPooledImage1cache = maxPooledImage1;
 
         float[,] featureLayer2 = GetFeatureLayer(maxPooledImage1, kernel2, 12);
         float[,] maxPooledImage2 = GetMaxPooledImage(featureLayer2, 8);

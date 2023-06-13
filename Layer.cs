@@ -1,4 +1,5 @@
 using System;
+using System.Diagnostics;
 
 namespace NonGUICNN
 {
@@ -124,7 +125,7 @@ namespace NonGUICNN
         }
 
         // Backward Propagation on Input layer
-        public void BackwardInput(float[] inputsArray, int batchIndex)
+        public void BackwardInput(float[] inputsArray, int batchIndex, ref float[,] bridgeSumWeightError)
         {
             float[] prevOutput = inputsArray;
             //weight adjustment
@@ -136,6 +137,7 @@ namespace NonGUICNN
                 for (int j = 0; j < n_inputs; j++)
                 {
                     deltaWeightsArray[i, j] += delI * prevOutput[j];
+                    bridgeSumWeightError[batchIndex, j] += delI * weightsArray[i, j];
                 }
             }
         }

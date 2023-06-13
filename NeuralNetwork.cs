@@ -45,7 +45,7 @@ namespace NonGUICNN
             return layers[layers.Length - 1].nodeArray;
         }
 
-        public void BackPropagate(float[] expected_output, float[] input_array)
+        public void BackPropagate(float[] expected_output, float[] input_array, ref float[,] sumWeightError)
         {
             for (int i = layers.Length - 1; i >= 0; i--)
             {
@@ -55,7 +55,7 @@ namespace NonGUICNN
                 }
                 else if (i == 0)
                 {
-                    layers[i].BackwardInput(input_array, learning_index);
+                    layers[i].BackwardInput(input_array, learning_index, ref sumWeightError);
                 }
                 else
                 {
