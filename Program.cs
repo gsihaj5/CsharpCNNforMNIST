@@ -4,15 +4,16 @@
     {
         public static void Main()
         {
-            int[] networkShape = { 784, 100, 100, 100, 100, 10 };
-            NeuralNetwork nn = new NeuralNetwork(networkShape, .01f, 1000, "Sigmoid");
+            int[] networkShape = { 16, 30, 30, 30, 10 };
+            NeuralNetwork nn = new NeuralNetwork(networkShape, .001f, 1000, "Sigmoid");
+            CNN cnn = new CNN();
 
             //raw processing directly from grayscale 
-            Train(nn, @"./mnist_train.csv");
-            EvaluateNN(nn, @"./mnist_test.csv");
+            Train(nn, cnn, @"./mnist_train.csv");
+            EvaluateNN(nn, cnn, @"./mnist_test.csv");
         }
 
-        private static void Train(NeuralNetwork nn, string filename)
+        private static void Train(NeuralNetwork nn, CNN cnn, string filename)
         {
             using (var reader = new StreamReader(filename))
             {
@@ -24,20 +25,19 @@
                     float[] oneHotEncoding = new float[10];
                     int label = Convert.ToInt16(values?[0]);
                     oneHotEncoding[label] = 1;
-                    float[] grayscales = Array.ConvertAll(values, float.Parse);
-                    Console.WriteLine(grayscales.Length);
+                    float[] float_values = Array.ConvertAll(values, float.Parse);
+                    float[] grayscales = new float[784];
+                    Array.Copy(float_values, 1, grayscales, 0, 784);
 
-                    Console.WriteLine(label);
-                    oneHotEncoding.ToList().ForEach(i => Console.Write(i.ToString()));
-                    Console.WriteLine();
+                    float[] preparedImage = cnn.getPreparedImage(grayscales);
 
-                    nn.Process(grayscales);
-                    nn.BackPropagate(oneHotEncoding, grayscales);
+                    nn.Process(preparedImage);
+                    nn.BackPropagate(oneHotEncoding, preparedImage);
                 }
             }
         }
 
-        private static void EvaluateNN(NeuralNetwork nn, string filename)
+        private static void EvaluateNN(NeuralNetwork nn, CNN cnn, string filename)
         {
             int numberOfTruth = 0;
             int numberOfFalse = 0;

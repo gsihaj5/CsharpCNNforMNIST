@@ -32,7 +32,7 @@ namespace NonGUICNN
                 if (i == 0)
                 {
                     layers[i].Forward(inputs);
-                    layers[i].Activation();
+                    layers[i].ReluActivation(); // from grayscale
                 }
                 else
                 {

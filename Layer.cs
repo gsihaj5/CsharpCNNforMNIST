@@ -2,7 +2,6 @@ using System;
 
 namespace NonGUICNN
 {
-
     public class Layer
     {
         public float[,] weightsArray;
@@ -22,6 +21,7 @@ namespace NonGUICNN
         {
             return n_inputs;
         }
+
         public int GetNodeCount()
         {
             return n_nodes;
@@ -56,7 +56,7 @@ namespace NonGUICNN
             for (int i = 0; i < biasesArray.Length; i++)
             {
                 //biasesArray[i] = (float)rand.Next(-100, 100) / 100f;
-                biasesArray[i] = (float) rand.NextNormal(mean,standardDeviation);
+                biasesArray[i] = (float)rand.NextNormal(mean, standardDeviation);
                 //biasesArray[i] = 0;
             }
 
@@ -66,7 +66,7 @@ namespace NonGUICNN
                 for (int j = 0; j < n_inputs; j++)
                 {
                     //weightsArray[i, j] = (float)rand.Next(-100, 100) / 100f;
-                    weightsArray[i, j] = (float) rand.NextNormal(mean,standardDeviation);
+                    weightsArray[i, j] = (float)rand.NextNormal(mean, standardDeviation);
                 }
             }
         }
@@ -81,6 +81,7 @@ namespace NonGUICNN
                 {
                     nodeArray[i] += weightsArray[i, j] * inputsArray[j];
                 }
+
                 nodeArray[i] += biasesArray[i];
             }
         }
@@ -129,7 +130,7 @@ namespace NonGUICNN
             //weight adjustment
             for (int i = 0; i < n_nodes; i++)
             {
-                float delI = ActivationDerivative(nodeArray[i]) * sumWeightError[batchIndex, i];
+                float delI = ReLUDerivative(nodeArray[i]) * sumWeightError[batchIndex, i];
                 deltaBiasArray[i] += delI;
 
                 for (int j = 0; j < n_inputs; j++)
@@ -157,10 +158,11 @@ namespace NonGUICNN
             }
         }
 
-        private float ActivationDerivative(float value){
-            if(this.activation_function == "Relu") return ReLUDerivative(value);
-            else if(this.activation_function == "Sigmoid") return SigmoidDerivative(value);
-            else if(this.activation_function == "Selu") return SELUDerivative(value);
+        private float ActivationDerivative(float value)
+        {
+            if (this.activation_function == "Relu") return ReLUDerivative(value);
+            else if (this.activation_function == "Sigmoid") return SigmoidDerivative(value);
+            else if (this.activation_function == "Selu") return SELUDerivative(value);
 
             return 0f;
         }
@@ -172,7 +174,7 @@ namespace NonGUICNN
 
         private float SigmoidDerivative(float value)
         {
-            return (1/(1+(MathF.Exp(-value))));
+            return (1 / (1 + (MathF.Exp(-value))));
         }
 
         public float SELUDerivative(float x, float alpha = 1.67326f, float scale = 1.0507f)
@@ -190,9 +192,9 @@ namespace NonGUICNN
 
         public void Activation()
         {
-            if(this.activation_function == "Relu") ReluActivation();
-            else if(this.activation_function == "Sigmoid") SigmoidActivation();
-            else if(this.activation_function == "Selu") Selu();
+            if (this.activation_function == "Relu") ReluActivation();
+            else if (this.activation_function == "Sigmoid") SigmoidActivation();
+            else if (this.activation_function == "Selu") Selu();
         }
 
         public void Selu(float alpha = 1.67326f, float scale = 1.0507f)
@@ -210,7 +212,8 @@ namespace NonGUICNN
             }
         }
 
-        public void ReluActivation(){
+        public void ReluActivation()
+        {
             for (int i = 0; i < n_nodes; i++)
             {
                 //relu
