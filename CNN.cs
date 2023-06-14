@@ -3,7 +3,7 @@
 public class CNN
 {
     private float[,] kernel1, kernel2;
-    private float[,] kernel1deltaWeight, kernel2deltaWeight;
+    private float[,] kernel1deltaWeight, kernelDeltaWeight;
     private float[,] maxPooledImage1cache;
     private float[,] feature2sumWeightError;
 
@@ -12,8 +12,8 @@ public class CNN
         kernel1 = createRandomKernel();
         kernel2 = createRandomKernel();
         kernel1deltaWeight = new float[5, 5];
-        kernel2deltaWeight = new float[5, 5];
-        feature2sumWeightError = new float[64,64];
+        kernelDeltaWeight = new float[5, 5];
+        feature2sumWeightError = new float[64, 64];
     }
 
     private float[,] createRandomKernel()
@@ -24,7 +24,7 @@ public class CNN
         {
             for (int x = 0; x < 5; x++)
             {
-                newKernel[x, y] = (float)rand.NextNormal(0, 1);
+                newKernel[x, y] = (float)rand.NextNormal(0, 5);
             }
         }
 
@@ -73,8 +73,8 @@ public class CNN
                 for (int y = -2; y < 2; y++)
                 {
                     for (int x = -2; x < 2; x++)
-                        kernel2deltaWeight[x + 2, y + 2] += maxPooledImage1cache[centerX + x, centerY + y] *
-                                                            feature2sumWeightError[centerX - 2, centerY - 2];
+                        kernelDeltaWeight[x + 2, y + 2] += maxPooledImage1cache[centerX + x, centerY + y] *
+                                                            feature2sumWeightError[centerX + x, centerY + y];
                 }
             }
         }
@@ -86,8 +86,8 @@ public class CNN
         {
             for (int x = 0; x < 5; x++)
             {
-                kernel2[x, y] += kernel2deltaWeight[x, y];
-                kernel2deltaWeight[x, y] = 0;
+                kernel2[x, y] += kernelDeltaWeight[x, y];
+                kernelDeltaWeight[x, y] = 0;
             }
         }
     }
@@ -95,7 +95,7 @@ public class CNN
     public void maxPoolSumWeightError(float[,] sumWeightError, int originalImageDimension, int learning_batch)
     {
         int counter = 0;
-        for (int cornerY = 0; cornerY <originalImageDimension - 2; cornerY += 2)
+        for (int cornerY = 0; cornerY < originalImageDimension - 2; cornerY += 2)
         {
             for (int cornerX = 0; cornerX < originalImageDimension - 2; cornerX += 2)
             {
