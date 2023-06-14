@@ -86,7 +86,7 @@ namespace NonGUICNN
 
         public float getAccuracy(int truth, int false_pred)
         {
-            return truth * 10 / ((float)truth + false_pred);
+            return truth / ((float)truth + false_pred);
         }
     }
 }
