@@ -4,11 +4,14 @@
     {
         public static void Main()
         {
-            int[] networkShape = { 16, 
+            int[] networkShape =
+            {
+                16,
                 128,
                 128,
-                10 };
-            NeuralNetwork nn = new NeuralNetwork(networkShape, .001f, 1000, "Sigmoid");
+                10
+            };
+            NeuralNetwork nn = new NeuralNetwork(networkShape, .01f, 1000, "Relu");
             CNN cnn = new CNN();
 
             //raw processing directly from grayscale 
@@ -85,7 +88,7 @@
                 }
             }
 
-            float accuracy = (float)numberOfTruth / ((float)numberOfTruth + (float)numberOfFalse);
+            float accuracy = nn.getAccuracy(numberOfTruth, numberOfFalse);
             Console.WriteLine("Accuracy");
             Console.WriteLine(accuracy);
         }

@@ -83,5 +83,10 @@ namespace NonGUICNN
                 layer.UpdateWeight();
             }
         }
+
+        public float getAccuracy(int truth, int false_pred)
+        {
+            return truth / ((float)truth + false_pred);
+        }
     }
 }
